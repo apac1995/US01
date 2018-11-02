@@ -1,0 +1,220 @@
+US01_Tutorial Class 2
+We are going to analyse an Excel table today
+In [ ]:
+
+import pandas as pd
+First, we try to open the excel file
+In [ ]:
+
+pd.read_excel('/Users/aaronpui/Downloads/Data-sheet-STUDENTS.xlsx')
+​
+Now we want to extract the coutries from the table
+In [ ]:
+
+pd.read_excel('/Users/aaronpui/Downloads/Data-sheet-STUDENTS.xlsx',
+            header=2,
+            usecols='B',
+                names=['countries']
+​
+             )
+'df' here means Dataframe
+In [ ]:
+
+df=pd.read_excel('/Users/aaronpui/Downloads/Data-sheet-STUDENTS.xlsx',
+            header=2,
+            usecols='B',
+                names=['countries']
+​
+             )
+In [ ]:
+
+df['countries'][3]
+To get a complet Data/Statistic in a table form
+In [ ]:
+
+df.describe()
+Transform dataframe into library so that it is easier to use it later.Next, we could fill in or add on the things inside the bracket
+In [38]:
+
+countries={}
+for country in df['countries']:
+    countries[country]={}
+countries
+Out[38]:
+{'Afghanistan': {},
+ 'Albania': {},
+ 'Armenia': {},
+ 'Azerbaijan': {},
+ 'Bahrain': {},
+ 'Bangladesh': {},
+ 'Belarus': {},
+ 'Bhutan': {},
+ 'Bosnia and Herzegovina': {},
+ 'Brunei': {},
+ 'Bulgaria': {},
+ 'Cambodia': {},
+ 'China': {},
+ 'Croatia': {},
+ 'Czech Republic': {},
+ 'East Timor': {},
+ 'Egypt': {},
+ 'Estonia': {},
+ 'France (Not BRI)': {},
+ 'Georgia': {},
+ 'Germany (not BRI)': {},
+ 'Hungary': {},
+ 'India': {},
+ 'Indonesia': {},
+ 'Iran': {},
+ 'Iraq': {},
+ 'Israel': {},
+ 'Jordan': {},
+ 'Kazakhstan': {},
+ 'Kuwait': {},
+ 'Kyrgyzstan': {},
+ 'Laos': {},
+ 'Latvia': {},
+ 'Lebanon': {},
+ 'Lithuania': {},
+ 'Macedonia': {},
+ 'Malaysia': {},
+ 'Maldives': {},
+ 'Moldova': {},
+ 'Mongolia': {},
+ 'Montenegro': {},
+ 'Myanmar': {},
+ 'Nepal': {},
+ 'Oman': {},
+ 'Pakistan': {},
+ 'Philippines': {},
+ 'Poland': {},
+ 'Qatar': {},
+ 'Romania': {},
+ 'Russia': {},
+ 'Saudi Arabia': {},
+ 'Serbia': {},
+ 'Singapore': {},
+ 'Slovakia': {},
+ 'Slovenia': {},
+ 'Sri Lanka': {},
+ 'Syria': {},
+ 'Tajikistan': {},
+ 'Thailiand': {},
+ 'The United Arab Emirates': {},
+ 'Turkey': {},
+ 'Turkmenistan': {},
+ 'United Kingdom (Not BRI)': {},
+ 'United States of America (Not BRI)': {},
+ 'Ukraine': {},
+ 'Uzbekistan': {},
+ 'Vietnam': {},
+ 'Yemen': {}}
+We make a list of key, and then we have a list. We have 'url' given by website, we just copy and paste exactly from internet. We put json into data.
+In [ ]:
+
+import requests 
+test_country = list(countries.keys())[0]
+url = 'https://restcountries.eu/rest/v2/name/'+test_country
+r = requests.get(url)
+data=r.json()
+print(test_country,data[0]['name'],data[0]['alpha2Code'])
+'tqdm' part is for the bar indication (the progression with percentage)
+In [36]:
+
+import requests 
+from tqdm import tnrange, tqdm_notebook
+from time import sleep
+​
+for i in tnrange(len(countries.keys())):
+    try:
+        country = list(countries.keys())[0]
+        url = 'https://restcountries.eu/rest/v2/name/'+country
+        r = requests.get(url)
+        data=r.json()
+        countries[test_country]['alpha2code']=data[0]['alpha2Code']
+        sleep(5)
+    except KeyError:
+        print (data)
+        sleep(5)
+A Jupyter widget could not be displayed because the widget state could not be found. This could happen if the kernel storing the widget is no longer available, or if the widget state was not saved in the notebook. You may be able to create the widget by running the appropriate cells.
+We can list down the countries that we dont found. k=key=country v=value=alphacode
+In [ ]:
+
+for k,v in countries.items():
+    if len(v.keys()) = 0:
+        print(k)
+Now we want to remove 'bri', 'strip' is use to remove the space. Remember to change the 'country' to 'k' because we are not going to ask the provider to change the error in the table, just keep the error.
+In [34]:
+
+for k,v in countries.items():
+    if len(v.keys()) = 0:
+        if 'not bri' in k.lower():
+            print(k,split('(')[0].strip())
+        elif k = 'Thailand':
+            print('thailand')
+        else:
+            country = k[4:]
+        try:
+        country = list(countries.keys())[0]
+        url = 'https://restcountries.eu/rest/v2/name/'+country
+        r = requests.get(url)
+        data=r.json()
+        countries[k]['alpha2code']=data[0]['alpha2Code']
+        sleep(5)
+    except KeyError:
+        print (data)
+        sleep(5)
+  File "<ipython-input-34-f17d3a2e19fc>", line 2
+    if len(v.keys()) = 0:
+                     ^
+SyntaxError: invalid syntax
+
+
+Now we try to find out the GDP of each country
+In [ ]:
+
+for k,v in countries.items():
+    try:
+        url = http://api.worldbank.org/v2/countries/'+v['alpha2code']+'/indicators/NY.GDP.MKTP.CD
+        r = requests.get(url)
+        data = r.json()
+        countries[k]['gdp'] = float(data[1][0]['value']) 
+        sleep(2)
+    except IndexError:
+        print(k,'has an index problem',data)
+    except TypeError:
+        print(k,'has a type problem',data)
+    
+We know obviously that we have problem with the country code for India, so we just change it manually, it is much more faster
+In [ ]:
+
+countries['India']['alpha2Code']= 'IN'
+url = http://api.worldbank.org/v2/countries/IN/indicators/NY.GDP.MKTP.CD?format=js
+r = requests.get(url)
+data = r.json()
+countries['India']['gdp'] = float(data[1][0]['value'])
+In [ ]:
+
+countries ['India'].pop('alpha2Code')
+countries ['Yemen']['gdp'] = None
+countries ['Syria']['gdp'] = None
+We want to create a list of GDP
+In [ ]:
+
+[v['gdp'] for k,v in countries.items() if 'gdp' in v.keys()]
+We could add the list to the series, in the table before
+In [ ]:
+
+s = [v['gdp'] for k,v in countries.items() if 'gdp' in v.keys()]
+In [ ]:
+
+df['gdp'] = s
+In [ ]:
+
+df.describe()
+'Inline' means we want to plot or show the graph here,not other place.
+In [ ]:
+
+%matplotlib inline
+import matplotlib.pyplot as plt
+df.plot()
